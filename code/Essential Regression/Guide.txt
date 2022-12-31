@@ -1,7 +1,0 @@
-Upload datasets in .csv/.txt/.tsv format
-Choose delta,lambda
-Select beta estimation method
-Click on Compute!!!
-Wait for the message "Computation DONE" to be displayed at the bottom of the page
-Choose the files to be downloaded from the widget
-Click on GET REPORT
