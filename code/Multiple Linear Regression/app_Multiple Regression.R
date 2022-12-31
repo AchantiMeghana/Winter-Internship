@@ -3,7 +3,6 @@ library(shiny)
 library(vroom)
 library(rmarkdown)
 library(shinyWidgets)
-library(pheatmap)
 library(ggplot2)
 
 # Define UI for application
