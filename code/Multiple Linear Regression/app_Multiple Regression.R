@@ -8,48 +8,50 @@ library(ggplot2)
 # Define UI for application
 ui <- fluidPage(
   
-  #Title
+  #Display title
   titlePanel(strong("Linear Regression")),
   
-  #Background colour
+  #Set Background colour
   setBackgroundColor(color =c( "#ffd700","#fff2cc"),gradient = "radial"),
   
   fluidRow(
     column(3,
-           
-           #Upload dataset
+          
+           #Upload dataset containing X,Y data
            fileInput("upload","Upload your dataset",multiple= FALSE,
                      accept = c(".csv",".tsv",".txt")),
            
-           # Select independent variable x           
+           # COnditional UI           
           uiOutput("x_pick"),
-           br(),
-           # Select independent variable y          
+           br(),         
            uiOutput("y_pick"),
            br(),
-           #Choose no. of rows of table to be displayed
+           
+           #SLider Widget to choose no. of rows of table to be displayed
            sliderInput("n","Choose the number of rows of data to be displayed",
                        min= 0, max =0 ,step = 1,value =0)
     ),
     
     column(9,
-           #Plot output
+           #Plot multiple regression 
            plotOutput("multiple_regression_plot")
     )),
   
   fluidRow(
     column(2,
-           # Download reports        
+           # Generate download button        
            downloadButton("download","Get your report!", icon = shiny::icon("download")) 
     )),
   
-  #display columns of dataset
+  #Display dataset table
   fluidRow(
     column(9,
            tableOutput("table")   
     )))  
 
-# Define server logic required to draw a histogram
+
+
+# Define server logic 
 server <- function(input, output,session) {
   
   #storing dataset in reactive variable
@@ -72,7 +74,7 @@ server <- function(input, output,session) {
     output$table <- renderTable(head(data(),input$n))
   })
   
-  #Update choices in widgets for x,y
+  #Update choices in widgets for x
   output$x_pick <- renderUI({
     req(data())
     xcol <- colnames(data())
@@ -82,6 +84,7 @@ server <- function(input, output,session) {
     
   })
   
+  #Update choices in widgets for x
   output$y_pick <- renderUI({
     req(data())
     ycol <- colnames(data())
@@ -91,96 +94,31 @@ server <- function(input, output,session) {
     
   })
 
-    # #Columns of x,y widgets
-  # ycol <- reactive({
-  #   req(data())
-  #   colnames(data())
-  # })
-  # 
-  # xcol <- reactive({
-  #   req(data())
-  #   colnames(data())
-  # })
-
-  # #Multiple linear regression model
-  # lmmodel <- reactive({
-  #   req(data(),input$x,input$y)
-  #   x <- as.numeric(data()[[as.name(input$x)]])
-  #   y <- as.numeric(data()[[as.name(input$y)]])
-  #   current_formula <- paste0(input$y, " ~ ", paste0(input$x, collapse = " + "))
-  #   current_formula <- as.formula(current_formula)
-  #   model <- lm(current_formula, data = data(), na.action=na.exclude)
-  #   return(model)
-  # })
-  # 
-  # 
-  # #Plotting multiple regression
-  #   output$multiple_regression_plot <- renderPlot({
-  #     req(lmmodel())
-  #     plot(lmmodel())
-  #     })
-  #   
-  # # Store summary of model
-  #   result <- reactive({
-  #     
-  #     req(lmmodel())
-  #     summary(lmmodel())
-  #   })
-  
-  # y <- reactive(as.numeric(unlist(data()[,input$y])))
-  # x_chosen <- reactive(as.numeric(unlist(data()[,input$x])))
-  # x_in_formula <- reactive(paste(x_chosen(),collapse = "+"))
-  
+ 
+  # Linear regression formula
   formula_lm <- reactive({
    paste(input$y, " ~ ", paste0(input$x, collapse = " + "))
     })
   
+  #Storing regression in a model
   model <- reactive({
     req(input$upload)
     lm(as.formula(formula_lm()),data=data(),na.action = na.exclude)
   })
-  
-  # output$multiple_regression_plot<- reactive({
-  # 
-  # })
-  
-  data_use <- reactive({
-    req(input$y,input$x,data())
-    res <- data()[,input$y]
-    for(i in 1: length(input$x)){
-      res <- cbind(res,data()[,input$x[i]])
-    }
-    colnames(res) <- c(input$y,input$x)
-    return(res)
-  })
-  col_res_x <- reactive({
-    colnames(data_use())
-  })
-  
-  colors_chosen <- reactive(colorRampPalette(c("#7c2828","#ffd700")))
-  
+
+  #Plot predicted values of Y vs residuals
   output$multiple_regression_plot <- renderPlot({
-    req(is.matrix(data_use()))
-    heatmap(x= data_use(),
-            col = colors_chosen(100),
-            main = "Heat map",
-            margins = c(5,10),
-            xlab = "Independent Variables",
-            ylab = "Dependent Variable",
-            scale = "column"
-            )
+   plot(fitted(model()),resid(model()),xlab="Fitted values",ylab="Residuals")
     })
   
-  
-  
-   #Downloading the report
+    #Downloading the report
   output$download <- downloadHandler(
     filename = "report.html",
-    content = function(file) {
+    content = function(file) { 
       
       #Using a temporary directory
       tempReport <- file.path(tempdir(), "report.Rmd")
-      file.copy("report.Rmd", tempReport, overwrite = TRUE)
+      file.copy("report_Multiple_Regression.Rmd", tempReport, overwrite = TRUE)
       
       # Setting up parameters to pass to Rmd document
       params <- model()
@@ -189,7 +127,6 @@ server <- function(input, output,session) {
       rmarkdown::render(tempReport, output_file = file,
                         params = params)}
   )
-
   
 }
 
