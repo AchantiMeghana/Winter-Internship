@@ -1,4 +1,3 @@
-#Version 2
 rm(list=ls())
 
 library(shiny)
@@ -8,11 +7,10 @@ library(readr)
 library(tidyverse)
 library(shinycssloaders)
 library(vroom)
-library(openxlsx)
 library(zip)
 
 
-setwd("C:/Users/Meghana Achanti/Documents/R/R/Regression/Linear Regression/Essential Regression")
+setwd(".../Essential Regression")
 source("SupLOVE.R")
 source("K-CV.R")
 source("Helper.R")
@@ -60,13 +58,7 @@ ui <- fluidPage(
            img(src = "Regression_cartoon.jpg",width =500)
     )
   ),
-  fluidRow(
-    column(6,
-           # #Display data set
-           # tableOutput("data_table"),
-    )
-  ),
-  
+    
   fluidRow(
     column(6,
            br(),
@@ -253,7 +245,6 @@ server <- function(input, output,session) {
       }
       
       zip::zip(file,files)
-      
     })
   
 }
