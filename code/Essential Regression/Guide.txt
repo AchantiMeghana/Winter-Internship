@@ -1,4 +1,4 @@
-Upload datasets
+Upload datasets in .csv/.txt/.tsv format
 Choose delta,lambda
 Select beta estimation method
 Click on Compute!!!
