@@ -17,6 +17,7 @@ Click on GET REPORT to download the report
 
 ##Guide to use app_Essential_Regression
 #In app_Essential_Regression, the working directory to be used must have the files placed in the source code folder 
+#To view the image on the app, place the folder code/ER/www in the working directory
 #The data provided in the dataset/ER folder has been used to demonstrate the app 
 Upload datasets in .csv/.txt/.tsv format
 Enter delta,lambda in the widgets named delta,lambda
