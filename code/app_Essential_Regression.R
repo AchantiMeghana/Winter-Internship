@@ -1,4 +1,4 @@
-rm(list=ls())
+rm(list=ls()) 
 
 library(shiny)
 library(shinyWidgets)
@@ -16,6 +16,7 @@ source("K-CV.R")
 source("Helper.R")
 source("Other_algorithms.R")
 
+
 # Define UI for application
 ui <- fluidPage(
   setBackgroundColor(color = c("#c8fffa","#d3ffce"),gradient="radial"),
@@ -24,37 +25,38 @@ ui <- fluidPage(
   
   fluidRow(
     column(6,
-           #Uploading data set
+           #Generate upload widget for X data
            fileInput("upload_x","Upload X",multiple = F),
            br(),
            
+          #Generate upload widget for Y data
            fileInput("upload_y","Upload Y",multiple = F),
            
-            #Choose delta
+           #Widget to choose delta
            numericInput("delta",label ="Choose delta",
                         value = NULL),
            br(),
            
-           #Choose lambda
+            #Widget to choose lambda
            numericInput("lambda",label ="Choose lambda",
                         value = NULL),
            br(),
            
-           #Choose beta_est_method
+            #Widget to choose method to estimate beta
            pickerInput("beta_est",
                        label ="Choose the method to be used to estimate beta", 
                        choices = NULL,selected= NULL),
-           
            br(),
            
-           #Action button
-           actionButton("submit","Compute !!! "),
            
+           #Action button 
+           actionButton("submit","Compute !!! "),
            br()
+           
     ),
-    
+
     column(6,
-           #Add an image
+           #Add an image in the right side of the webpage
            img(src = "Regression_cartoon.jpg",width =500)
     )
   ),
@@ -62,7 +64,7 @@ ui <- fluidPage(
   fluidRow(
     column(6,
            br(),
-           #Choose files to be downloaded
+           #Widget to choose files to be downloaded
            pickerInput("data_req",
                        label ="Choose the files to be downloaded", 
                        choices = NULL,selected= NULL,multiple = TRUE),
@@ -70,22 +72,20 @@ ui <- fluidPage(
     column(6,
             br(),
            
-           #Download result
+           #widget to download result
            downloadButton("download",label = "Get report!"),
            
-           #Display done
+           #Display message when computation is done
            h3(textOutput("done"))
     )
   )
-  
 )
-
 
 
 # Define server logic 
 server <- function(input, output,session) {
   
-  #Read data
+  #Read data from X dataset
   data_x <- reactive({
     req(input$upload_x)
     ext <- tools::file_ext(input$upload_x$name)
@@ -96,11 +96,14 @@ server <- function(input, output,session) {
                               escape_double = FALSE, trim_ws = TRUE),
             txt = read_delim(input$upload_x$datapath, " ",
                              escape_double = FALSE, trim_ws = TRUE),
+            #Display error message if the uploaded file is not .csv,.tsv,.txt file
             validate("Upload only .csv / .txt/ .tsv files")
     )
     
   })
   
+  
+   #Read data from Y dataset
   data_y <- reactive({
     req(input$upload_y)
     ext <- tools::file_ext(input$upload_y$name)
@@ -111,18 +114,18 @@ server <- function(input, output,session) {
                               escape_double = FALSE, trim_ws = TRUE),
             txt = read_delim(input$upload_y$datapath, " ",
                              escape_double = FALSE, trim_ws = TRUE),
+            #Display error message if the uploaded file is not .csv,.tsv,.txt file
             validate("Upload only .csv / .txt/ .tsv files")
     )
-    
   })
 
-  #Update beta_est_method
+  #Update choices in the widget to choose beta_estimation_method
   observeEvent(data_y(),{
     updatePickerInput(session=session,inputId ="beta_est",
                       choices = c("Dantzig","LS"))
   })
   
-   #Obtain x_data
+   # Store X data
   x_dat <- reactive({
     req(input$submit)
     as.matrix(data_x())
@@ -130,14 +133,19 @@ server <- function(input, output,session) {
   
   feature_names <- reactive(names(x_dat()))
   
+  #Store Y data
   y_dat <- reactive({
     req(input$submit)
     as.matrix(data_y())
   })
   
+  # Perform centering of Y using mean
   Y <- reactive( {y_dat() - colMeans(data_y(),na.rm = TRUE)})
+  
+  #scale X data
   X <- reactive({scale(x_dat(),center = TRUE,scale = TRUE )})
   
+  #Code for ER
   res <- reactive({
     req(input$submit,data_x(),data_y())
     
@@ -149,8 +157,7 @@ server <- function(input, output,session) {
   })
   
   #Obtain beta_coefficients,res, z_hat
-  
-  beta <- reactive({
+    beta <- reactive({
     res()$beta})
   
   beta_scaled <- reactive({
@@ -161,35 +168,27 @@ server <- function(input, output,session) {
   })
   
   
-  #z_hat
+  #Z_hat
   A_hat <- reactive( res()$A)
   z_hat <- reactive({
     X() %*% A_hat() %*% solve(crossprod(A_hat()))
   })
 
+  #Display message when computation is done
   output$done <- renderText({
     req(res())
     "COMPUTATION DONE"
   })
   
-  #Update download options
-  
+  #Update choices in the download widget
   observeEvent(input$submit,{
-    # req(input$beta_est =="Dantzig")
     updatePickerInput(session=session,inputId ="data_req",
                       choices = c("Result"= "res",
                                   "Beta" = "beta_coefficients",
                                   "Matrix Z" = "z_hat"))
   })
  
-  #Update format of files to be downloaded
-  observeEvent(input$submit,{
-    updatePickerInput(session=session,inputId = "format",choices = c("CSV"="csv",
-                                                                     "XLSX"="xlsx") )
-  })
-  
-  #Null data data frame
-  dat_null <- reactive(as.character("The value is NULL"))
+    dat_null <- reactive(as.character("The value is NULL"))
   
   # CSV format
   output$download <- downloadHandler(
