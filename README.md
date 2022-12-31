@@ -1,7 +1,10 @@
 ### Winter-Internship
 
+The code correspnding to the apps is placed in code folder.
+Sample data used in the apps is put in dataset folder.
+Output folder consists of the sample reports,screenshots of the working of the apps
 
-
+The rest of the document describes how to navigate through the apps.
 
 
 ##Guide to use app_Multiple_Linear_Regression 
