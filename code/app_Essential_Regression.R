@@ -188,25 +188,20 @@ server <- function(input, output,session) {
                                   "Matrix Z" = "z_hat"))
   })
  
-    dat_null <- reactive(as.character("The value is NULL"))
-  
-  # CSV format
+  # Download zip file
   output$download <- downloadHandler(
     filename = function() {
-      # if(input$format== "csv"){paste("Regression", ".zip", sep = "")}
-      # if(input$format== "xlsx"){paste("Regression", ".xlsx", sep = "")}
       paste("Regression", ".zip", sep = "")
     },
     
-    content = function(file) {
+    content = function(file) {#content of file to be downloaded
       
-      owd <- setwd(tempdir())
+      #set up temporary working directory
+      owd <- setwd(tempdir()) 
       on.exit(setwd(owd))
       files <- NULL;
-      # write.csv(res(), file)
       
-      # wb <-createWorkbook()
-      
+      #Content of result files
       if("res" %in% input$data_req) {
         for (i in 1:length(res())){
           if(i!= 5){
@@ -230,19 +225,22 @@ server <- function(input, output,session) {
           }
         }
       }
-      
+    
+      #Content of Z_hat file
       if("z_hat" %in% input$data_req){
         file_name <- paste(as.character("Z_hat"),".csv",sep = "")
         write.csv( z_hat(),file_name,row.names = FALSE)
         files <- c(file_name,files)         
       }
       
+      #Content of coefficients file
       if("beta_coefficients" %in% input$data_req){
         file_name <- paste(as.character("order_coef_beta"),".csv",sep = "")
         write.csv(order_coef_beta(),file_name,row.names = FALSE)
         files <- c(file_name,files)         
       }
       
+      #Zip the file
       zip::zip(file,files)
     })
   
