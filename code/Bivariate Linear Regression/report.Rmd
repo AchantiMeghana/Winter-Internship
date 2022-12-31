@@ -1,0 +1,50 @@
+---
+title: "Report"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Bivariate Linear Regression
+
+```{r ,echo=FALSE}
+
+hist(y(),main = "Histogram of Independent Variable",xlab="Independent Variable")
+```
+
+Box plot can be used to find outliers in the data.
+```{r ,echo=FALSE}
+
+boxplot(y(),main = "Boxplot of Independent Variable")
+```
+
+A linear regression model has been used to analyse the dataset provided.
+
+```{r ,echo=FALSE}
+
+summary(model())
+```
+
+# Regression Model 
+
+
+
+```{r  echo=FALSE}
+   ggplot(data(),
+           aes(x(),y()))+ geom_point(alpha = 0.8)+ 
+      geom_abline(slope = model()$coefficients[2],
+                  intercept = model()$coefficients[1],color = "red")+
+      labs(x= input$x,y=input$y)
+```
+
+
+# Residuals plot
+```{r  echo=FALSE}
+   plot(model())
+
+```
+
+
+
