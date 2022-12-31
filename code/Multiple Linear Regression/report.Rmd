@@ -1,0 +1,51 @@
+---
+title: "Report"
+output: html_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Multiple Linear Regression
+
+A linear regression model has been used to analyse the data set provided. 
+The coordinates x, y denote independent, dependent variables respectively.
+
+```{r ,echo=FALSE}
+summary(model())
+```
+
+
+
+```{r ,echo=FALSE}
+hist(as.numeric(unlist(data()[,input$y])),main = "Histogram of Independent Variable",xlab = "Independent Variable")
+  
+```
+
+
+The values of correlation coefficients between independent variables
+
+```{r ,echo=FALSE}
+correlation <- cor(x=data()[,input$x],y=NULL)
+print(correlation)
+
+```
+
+
+```{r ,echo=FALSE}
+boxplot(as.numeric(unlist(data()[,input$y])),main = "Boxplot of Independent Variable")
+```
+
+
+# Results
+```{r ,echo=FALSE}
+plot(model())
+```
+
+
+
+
+
+
